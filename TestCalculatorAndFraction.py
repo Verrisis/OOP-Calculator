@@ -24,6 +24,10 @@ class TestFraction(unittest.TestCase):
         with self.assertRaises(ValueError):
             f.denominator = 0
 
+    def test_init_invalid_type_raises(self):
+        with self.assertRaises(TypeError):
+            Fraction("ala ma kota")
+
     def test_from_string(self):
         f = Fraction.from_string("3/4")
         self.assertEqual(f.numerator, 3)
@@ -93,6 +97,15 @@ class TestCalculator(unittest.TestCase):
         k = Calculator()
         self.assertEqual(str(k.parse_and_compute("1/2 + 1/2")), "1/1")
 
+    def test_parse_sub_rsub(self):
+        k = Calculator()
+        self.assertEqual(str(k.parse_and_compute("1/16 - 1/4")), "-3/16")
+        self.assertEqual(str(k.parse_and_compute("4 - 1/4")), "15/4")
+
+    def test_parse_mul(self):
+        k = Calculator()
+        self.assertEqual(str(k.parse_and_compute("1/16 * 1/4")), "1/64")
+
     def test_parse_div(self):
         k = Calculator()
         self.assertEqual(str(k.parse_and_compute("3/4 : 1/2")), "3/2")
@@ -140,9 +153,48 @@ class TestCalculator(unittest.TestCase):
 
         k = Calculator()
         k.load_from_file(filename)
-        self.assertEqual(k.history[0], "BLAD")
-        self.assertEqual(str(k.history[1]), "3/4")
+        self.assertEqual(k.err_history[0], "BŁĄD")
+        self.assertEqual(str(k.history[0]), "3/4")
         os.remove(filename)
+
+    def test_valid_does_not_go_to_err_history(self):
+        filename = "test_valid.txt"
+        with open(filename, "w") as f:
+            f.write("1/2 + 1/4\n")
+        k = Calculator()
+        k.load_from_file(filename)
+        self.assertEqual(len(k.err_history), 0)
+        os.remove(filename)
+
+    def test_invalid_goes_to_err_history(self):
+        filename = "test_invalid.txt"
+        with open(filename, "w") as f:
+            f.write("ala ma kota\n")
+        k = Calculator()
+        k.load_from_file(filename)
+        self.assertEqual(len(k.err_history), 1)
+        os.remove(filename)
+
+    def test_mixed_file_splits_correctly(self):
+        filename = "test_mixed.txt"
+        with open(filename, "w") as f:
+            f.write("1/2 + 1/4\n")
+            f.write("ala ma kota\n")
+            f.write("1/3 + 1/3\n")
+        k = Calculator()
+        k.load_from_file(filename)
+        self.assertEqual(len(k.history), 2)
+        self.assertEqual(len(k.err_history), 1)
+        os.remove(filename)
+
+    def test_err_file_created_on_save(self):
+        filename = "test_save.txt"
+        k = Calculator()
+        k.err_history.append("bzdura")
+        k.save_to_file(filename)
+        self.assertTrue(os.path.exists("err_" + filename))
+        os.remove(filename)
+        os.remove("err_" + filename)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ from Fraction import Fraction
 class Calculator:
     def __init__(self):
         self.history = []
+        self.err_history = []
 
     def __enter__(self):
         print("--- Kalkulator ułamków uruchomiony ---")
@@ -54,12 +55,15 @@ class Calculator:
                     fraction = self.parse_and_compute(clean_line)
                     self.history.append(fraction)
                 except (ValueError, ZeroDivisionError, IndexError, TypeError):
-                    self.history.append('BLAD')
+                    self.err_history.append('BŁĄD')
 
     def save_to_file(self, filename):
         with open(filename, "w") as f:
             for fraction in self.history:
                 f.write(f"{fraction}\n")
+        with open("err_" + filename, "w") as f1:
+            for error in self.err_history:
+                f1.write(f"{error}\n")
 
     def run(self):
         print("Wpisz wyrażenie (np. '1/2 + 1/4') lub 'exit' by zakończyć:")
@@ -86,13 +90,16 @@ class Calculator:
                 print(f"Wynik: {wynik}")
 
             except EOFError:
-                self.history.append("EOFError")
+                self.err_history.append("EOFError")
                 break
             except (ValueError, ZeroDivisionError, IndexError, TypeError) as e:
-                self.history.append(f"Błąd: {e}")
+                self.err_history.append(f"Błąd: {e}")
                 print(f"Błąd: {e}")
+            except KeyboardInterrupt:
+                print("Działanie przerwano za pomocą klawiatury")
+                break
             except Exception as e:
-                self.history.append(f"Niespodziewany Błąd: {e}")
+                self.err_history.append(f"Niespodziewany Błąd: {e}")
                 print(f"Niespodziewany Błąd: {e}")
 
 
