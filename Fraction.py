@@ -126,7 +126,10 @@ class Fraction(MathExpression):
         if "/" in text:
             num, den = map(int, text.split("/"))
             return cls(num, den)
-        return cls(int(text), 1)
+        cleaned = text.replace(",", ".")
+        if "." in cleaned:
+            return cls(float(cleaned))
+        return cls(int(cleaned), 1)
 
     @staticmethod
     def harmonic_series(n):
