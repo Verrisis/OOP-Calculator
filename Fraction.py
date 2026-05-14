@@ -19,14 +19,12 @@ class Fraction(MathExpression):
     def __init__(self, numerator, denominator):
         self.numerator = numerator
         self.denominator = denominator
-        self.reduce()
 
     @dispatch(float)
     def __init__(self, value):
         num, den = value.as_integer_ratio()
         self.numerator = num
         self.denominator = den
-        self.reduce()
 
     @dispatch(object)
     def __init__(self, other):
