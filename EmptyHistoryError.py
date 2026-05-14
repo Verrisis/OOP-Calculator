@@ -1,0 +1,2 @@
+class EmptyHistoryError(Exception):
+    pass

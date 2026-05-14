@@ -17,8 +17,6 @@ class Fraction(MathExpression):
 
     @dispatch(int, int)
     def __init__(self, numerator, denominator):
-        if denominator == 0:
-            raise ZeroDivisionError("Mianownik nie może być zerem!")
         self.numerator = numerator
         self.denominator = denominator
         self.reduce()
@@ -72,9 +70,11 @@ class Fraction(MathExpression):
         new_num = self.numerator * other.denominator + other.numerator * self.denominator
         new_den = self.denominator * other.denominator
         return Fraction(new_num, new_den)
+
     @dispatch(int)
     def __add__(self, other):
         return self + Fraction(other, 1)
+
     __radd__ = __add__
 
     @dispatch(object)
@@ -82,9 +82,11 @@ class Fraction(MathExpression):
         new_num = self.numerator * other.denominator - other.numerator * self.denominator
         new_den = self.denominator * other.denominator
         return Fraction(new_num, new_den)
+
     @dispatch(int)
     def __sub__(self, other):
         return self - Fraction(other, 1)
+
     @dispatch(int)
     def __rsub__(self, other):
         return Fraction(other, 1) - self
@@ -94,10 +96,12 @@ class Fraction(MathExpression):
         new_num = self.numerator * other.numerator
         new_den = self.denominator * other.denominator
         return Fraction(new_num, new_den)
+
     @dispatch(int)
     def __mul__(self, other):
         new_fraction = Fraction(other, 1)
         return self * new_fraction
+
     __rmul__ = __mul__
 
     @dispatch(object)
@@ -105,10 +109,12 @@ class Fraction(MathExpression):
         new_num = self.numerator * other.denominator
         new_den = self.denominator * other.numerator
         return Fraction(new_num, new_den)
+
     @dispatch(int)
     def __truediv__(self, other):
         new_fraction = Fraction(other, 1)
         return self / new_fraction
+
     @dispatch(int)
     def __rtruediv__(self, other):
         return Fraction(other, 1) / self
@@ -120,7 +126,6 @@ class Fraction(MathExpression):
         print(f"{self.__dict__}")
         print(f"{Fraction.__dict__}")
 
-    # noinspection PyArgumentList
     @classmethod
     def from_string(cls, text):
         if "/" in text:
@@ -135,3 +140,10 @@ class Fraction(MathExpression):
     def harmonic_series(n):
         for i in range(1, n + 1):
             yield Fraction(1, i)
+
+    @staticmethod
+    def sum_harmonic_series(n):
+        suma = Fraction()
+        for fraction in Fraction.harmonic_series(n):
+            suma += fraction
+        return suma
