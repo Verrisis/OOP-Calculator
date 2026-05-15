@@ -30,15 +30,15 @@ class Calculator:
         else:
             raise ValueError("Niepoprawny format. Użyj: 'ułamek operator ułamek'")
 
-    def _compute(self, u1, operator, u2):
+    def _compute(self, f1, operator, f2):
         if operator == "+":
-            return u1 + u2
+            return f1 + f2
         elif operator == "-":
-            return u1 - u2
+            return f1 - f2
         elif operator == "*":
-            return u1 * u2
+            return f1 * f2
         elif operator == ":":
-            return u1 / u2
+            return f1 / f2
         else:
             raise NotImplementedError("Obecnie obsługujemy tylko operatory: +, -, *, :")
 

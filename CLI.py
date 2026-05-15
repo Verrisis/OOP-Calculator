@@ -53,8 +53,11 @@ class ConsoleUI:
                         print("Błąd: Podaj nazwę pliku, np. 'wczytaj wejscie.txt'")
                     continue
                 if linia.lower().startswith("debug"):
-                    print(f"Info do debugowania:")
-                    self.calc.history[-1].debug_info()
+                    if self.calc.history:
+                        print(f"Info do debugowania:")
+                        self.calc.history[-1].debug_info()
+                    else:
+                        print("Historia jest pusta.")
                     continue
                 if linia.lower() in ['exit', 'quit']:
                     self.print_history()
