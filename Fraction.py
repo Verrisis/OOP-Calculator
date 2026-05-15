@@ -1,13 +1,6 @@
 import math
-from abc import ABC, abstractmethod
+from MathExpression import MathExpression
 from multipledispatch import dispatch
-
-
-class MathExpression(ABC):
-    @abstractmethod
-    def reduce(self):
-        pass
-
 
 class Fraction(MathExpression):
     @dispatch()
@@ -19,6 +12,11 @@ class Fraction(MathExpression):
     def __init__(self, numerator, denominator):
         self.numerator = numerator
         self.denominator = denominator
+
+    @dispatch(int)
+    def __init__(self, numerator):
+        self.numerator = numerator
+        self.denominator = 1
 
     @dispatch(float)
     def __init__(self, value):
