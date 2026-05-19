@@ -1,6 +1,9 @@
 import math
-from MathExpression import MathExpression
+
 from multipledispatch import dispatch
+
+from MathExpression import MathExpression
+
 
 class Fraction(MathExpression):
     @dispatch()
@@ -8,15 +11,15 @@ class Fraction(MathExpression):
         self.numerator = 0
         self.denominator = 1
 
-    @dispatch(int, int)
-    def __init__(self, numerator, denominator):
-        self.numerator = numerator
-        self.denominator = denominator
-
     @dispatch(int)
     def __init__(self, numerator):
         self.numerator = numerator
         self.denominator = 1
+
+    @dispatch(int, int)
+    def __init__(self, numerator, denominator):
+        self.numerator = numerator
+        self.denominator = denominator
 
     @dispatch(float)
     def __init__(self, value):
@@ -67,9 +70,9 @@ class Fraction(MathExpression):
         new_den = self.denominator * other.denominator
         return Fraction(new_num, new_den)
 
-    @dispatch(int)
+    @dispatch((int, float))
     def __add__(self, other):
-        return self + Fraction(other, 1)
+        return self + Fraction(other)
 
     __radd__ = __add__
 
@@ -79,13 +82,13 @@ class Fraction(MathExpression):
         new_den = self.denominator * other.denominator
         return Fraction(new_num, new_den)
 
-    @dispatch(int)
+    @dispatch((int, float))
     def __sub__(self, other):
-        return self - Fraction(other, 1)
+        return self - Fraction(other)
 
-    @dispatch(int)
+    @dispatch((int, float))
     def __rsub__(self, other):
-        return Fraction(other, 1) - self
+        return Fraction(other) - self
 
     @dispatch(object)
     def __mul__(self, other):
@@ -93,9 +96,9 @@ class Fraction(MathExpression):
         new_den = self.denominator * other.denominator
         return Fraction(new_num, new_den)
 
-    @dispatch(int)
+    @dispatch((int, float))
     def __mul__(self, other):
-        new_fraction = Fraction(other, 1)
+        new_fraction = Fraction(other)
         return self * new_fraction
 
     __rmul__ = __mul__
@@ -106,14 +109,14 @@ class Fraction(MathExpression):
         new_den = self.denominator * other.numerator
         return Fraction(new_num, new_den)
 
-    @dispatch(int)
+    @dispatch((int, float))
     def __truediv__(self, other):
-        new_fraction = Fraction(other, 1)
+        new_fraction = Fraction(other)
         return self / new_fraction
 
-    @dispatch(int)
+    @dispatch((int, float))
     def __rtruediv__(self, other):
-        return Fraction(other, 1) / self
+        return Fraction(other) / self
 
     def __str__(self):
         return f"{self.numerator}/{self.denominator}"

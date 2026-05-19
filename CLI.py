@@ -8,11 +8,15 @@ class ConsoleUI:
         self.calc = Calculator()
 
     def __enter__(self):
-        print("--- Kalkulator ułamków uruchomiony ---")
+        print("\n" + "=" * 44)
+        print("   Kalkulator ułamków i liczb zespolonych")
+        print("=" * 44)
         return self
 
     def __exit__(self, exc_type, exc_val, traceback):
-        print("--- Zamykanie Kalkulatora ---")
+        print("\n" + "=" * 44)
+        print("   Zamykanie kalkulatora. Do widzenia!")
+        print("=" * 44)
         if exc_type:
             print(f"Wystąpił błąd krytyczny: {exc_val}")
         return False
@@ -23,13 +27,14 @@ class ConsoleUI:
             print(f"{i}. {wynik}")
 
     def run(self):
-        print("Wpisz wyrażenie (np. '1/2 + 1/4') lub 'exit' by zakończyć:")
+        print(
+            f"Wpisz wyrażenie (np. '1/2 + 1/4', '(1/2)+(2/3)i * (2/1)-(1/2)i')\nWpisz 'pomoc', aby zobaczyć dodatkowe komendy, lub 'exit', by zakończyć.")
         while True:
             try:
                 linia = input("> ").strip()
                 if linia.lower().startswith("pomoc"):
                     print(
-                        f"Dostępne komendy:\n1) Debug\n2) Zapisz *imię pliku*\n3) Wczytaj *imię pliku*\n4) Szereg *ułamek*")
+                        f"Dostępne komendy:\n1) zapisz <plik>  - Zapisuje historię i błędy do pliku\n2) wczytaj <plik> - Wczytuje i przelicza historię z pliku\n3) szereg <n>     - Liczy n-ty element szeregu harmonicznego\n4) debug          - Pokazuje info o ostatnim wyniku\n5) exit / quit    - Wyjście z programu")
                     continue
                 if linia.lower().startswith("zapisz"):
                     parts = linia.split()
@@ -38,11 +43,11 @@ class ConsoleUI:
                             FileManager.save_to_file(self.calc, parts[1])
                             print(f"Zapisano historię do pliku {parts[1]}")
                         except EmptyHistoryError:
-                            print("Historia jest pusta. Nie zapisuje pliku")
+                            print("Historia jest pusta. Nie zapisano pliku")
                         except Exception as e:
                             print(f"Błąd zapisu do pliku: {e}")
                     else:
-                        print("Błąd: Podaj nazwę pliku, np. 'zapisz wyjscie.txt'")
+                        print("Użycie: wczytaj <nazwa_pliku>")
                     continue
                 if linia.lower().startswith("wczytaj"):
                     parts = linia.split()
@@ -54,13 +59,18 @@ class ConsoleUI:
                     continue
                 if linia.lower().startswith("debug"):
                     if self.calc.history:
-                        print(f"Info do debugowania:")
+                        print(f"Info do debugowania (ostatni wynik):")
                         self.calc.history[-1].debug_info()
                     else:
-                        print("Historia jest pusta.")
+                        print("Historia jest pusta")
+                    continue
+                if linia.lower() == "dyzio":
+                    print("👦 Dyzio: 'Dzięki za pomoc! Teraz na pewno zdam tę kartkówkę!'")
                     continue
                 if linia.lower() in ['exit', 'quit']:
                     self.print_history()
+                    print(f"Wykonano operacji: {len(self.calc.history)}")
+                    print(f"Napotkano błędów: {len(self.calc.err_history)}")
                     break
                 if not linia:
                     continue
@@ -70,7 +80,6 @@ class ConsoleUI:
                 print(f"Wynik: {wynik}")
 
             except EOFError:
-                self.calc.add_to_err_history("EOFError")
                 break
             except (ValueError, ZeroDivisionError, IndexError, TypeError) as e:
                 self.calc.add_to_err_history(f"Błąd: {e}")

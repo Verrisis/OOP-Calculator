@@ -1,4 +1,5 @@
 from Fraction import Fraction
+from ComplexFraction import ComplexFraction
 
 
 class Calculator:
@@ -14,13 +15,19 @@ class Calculator:
     def err_history(self):
         return tuple(self._err_history)
 
+    def _parse_operand(self, text):
+        if "i" in text:
+            return ComplexFraction.from_string(text)
+        else:
+            return Fraction.from_string(text)
+
     def _parse(self, expression_line):
         parts = expression_line.split()
 
         if len(parts) == 3:
-            u1 = Fraction.from_string(parts[0])
+            u1 = self._parse_operand(parts[0])
             operator = parts[1]
-            u2 = Fraction.from_string(parts[2])
+            u2 = self._parse_operand(parts[2])
             return "math", u1, operator, u2
 
         elif len(parts) == 2 and parts[0] == "szereg":
