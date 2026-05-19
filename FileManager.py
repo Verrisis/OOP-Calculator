@@ -8,7 +8,8 @@ class FileManager:
             with open(filename, "r") as f:
                 for line in f:
                     clean_line = line.strip()
-                    if not clean_line: continue
+                    if not clean_line:
+                        continue
 
                     try:
                         fraction = calc.evaluate(clean_line)
@@ -16,8 +17,10 @@ class FileManager:
                     except (ValueError, ZeroDivisionError, IndexError, TypeError) as e:
                         calc.add_to_err_history(f'BŁĄD: {e}')
 
-        except Exception as file_e:
-            print(f"Błąd systemu plików podczas wczytywania: {file_e}")
+        except (FileNotFoundError, PermissionError) as e:
+            print(f"Problem z dostępem do pliku '{filename}' (Brak pliku lub uprawnień): {e}")
+        except Exception as e:
+            print(f"Nieznany błąd systemu plików podczas wczytywania: {e}")
 
     @staticmethod
     def save_to_file(calc, filename):
