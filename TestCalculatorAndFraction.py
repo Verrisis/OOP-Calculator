@@ -1,10 +1,11 @@
-import unittest
 import os
+import unittest
 
-from EmptyHistoryError import EmptyHistoryError
-from Fraction import Fraction, MathExpression
 from Calculator import Calculator
+from ComplexFraction import ComplexFraction
+from EmptyHistoryError import EmptyHistoryError
 from FileManager import FileManager
+from Fraction import Fraction, MathExpression
 
 
 class TestFraction(unittest.TestCase):
@@ -552,6 +553,473 @@ class TestFileManager(unittest.TestCase):
         FileManager.load_from_file(k, "nonexistent_file_xyz_abc.txt")
         self.assertEqual(len(k.history), 0)
         self.assertEqual(len(k.err_history), 0)
+
+
+class TestComplexFractionConstructors(unittest.TestCase):
+
+    def test_default_constructor_real_is_zero(self):
+        c = ComplexFraction()
+        self.assertEqual(c.real.numerator, 0)
+        self.assertEqual(c.real.denominator, 1)
+
+    def test_default_constructor_imag_is_one(self):
+        c = ComplexFraction()
+        self.assertEqual(c.imag.numerator, 1)
+        self.assertEqual(c.imag.denominator, 1)
+
+    def test_constructor_with_two_fractions(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(3, 4))
+        self.assertEqual(c.real.numerator, 1)
+        self.assertEqual(c.real.denominator, 2)
+        self.assertEqual(c.imag.numerator, 3)
+        self.assertEqual(c.imag.denominator, 4)
+
+    def test_constructor_with_two_ints(self):
+        c = ComplexFraction(2, 3)
+        self.assertEqual(c.real.numerator, 2)
+        self.assertEqual(c.real.denominator, 1)
+        self.assertEqual(c.imag.numerator, 3)
+        self.assertEqual(c.imag.denominator, 1)
+
+    def test_constructor_with_zero_real(self):
+        c = ComplexFraction(0, Fraction(1, 4))
+        self.assertEqual(c.real.numerator, 0)
+        self.assertEqual(c.imag.numerator, 1)
+        self.assertEqual(c.imag.denominator, 4)
+
+    def test_constructor_with_negative_real(self):
+        c = ComplexFraction(Fraction(-1, 2), Fraction(1, 2))
+        self.assertEqual(c.real.numerator, -1)
+        self.assertEqual(c.real.denominator, 2)
+
+    def test_constructor_with_negative_imag(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(-3, 4))
+        self.assertEqual(c.imag.numerator, -3)
+        self.assertEqual(c.imag.denominator, 4)
+
+    def test_constructor_real_and_imag_are_fraction_instances(self):
+        c = ComplexFraction(1, 2)
+        self.assertIsInstance(c.real, Fraction)
+        self.assertIsInstance(c.imag, Fraction)
+
+    def test_constructor_reduces_real(self):
+        c = ComplexFraction(Fraction(2, 4), Fraction(1, 2))
+        self.assertEqual(c.real.numerator, 1)
+        self.assertEqual(c.real.denominator, 2)
+
+    def test_constructor_reduces_imag(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(4, 8))
+        self.assertEqual(c.imag.numerator, 1)
+        self.assertEqual(c.imag.denominator, 2)
+
+
+class TestComplexFractionFromString(unittest.TestCase):
+
+    def test_from_string_positive_imag(self):
+        c = ComplexFraction.from_string("(1/2)+(1/4)i")
+        self.assertEqual(c.real.numerator, 1)
+        self.assertEqual(c.real.denominator, 2)
+        self.assertEqual(c.imag.numerator, 1)
+        self.assertEqual(c.imag.denominator, 4)
+
+    def test_from_string_negative_imag(self):
+        c = ComplexFraction.from_string("(1/2)-(1/4)i")
+        self.assertEqual(c.real.numerator, 1)
+        self.assertEqual(c.real.denominator, 2)
+        self.assertEqual(c.imag.numerator, -1)
+        self.assertEqual(c.imag.denominator, 4)
+
+    def test_from_string_integer_parts(self):
+        c = ComplexFraction.from_string("(3)+(2)i")
+        self.assertEqual(c.real.numerator, 3)
+        self.assertEqual(c.imag.numerator, 2)
+
+    def test_from_string_zero_real(self):
+        c = ComplexFraction.from_string("(0)+(1/2)i")
+        self.assertEqual(c.real.numerator, 0)
+        self.assertEqual(c.imag.numerator, 1)
+        self.assertEqual(c.imag.denominator, 2)
+
+    def test_from_string_returns_complex_fraction_instance(self):
+        c = ComplexFraction.from_string("(1/2)+(1/4)i")
+        self.assertIsInstance(c, ComplexFraction)
+
+    def test_from_string_both_negative(self):
+        c = ComplexFraction.from_string("(-1/2)-(-1/4)i")
+        self.assertEqual(c.real.numerator, -1)
+        self.assertEqual(c.imag.numerator, 1)
+
+    def test_from_string_reduces_parts(self):
+        c = ComplexFraction.from_string("(2/4)+(2/6)i")
+        self.assertEqual(c.real.numerator, 1)
+        self.assertEqual(c.real.denominator, 2)
+        self.assertEqual(c.imag.numerator, 1)
+        self.assertEqual(c.imag.denominator, 3)
+
+    def test_from_string_garbage_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            ComplexFraction.from_string("ala")
+
+    def test_from_string_missing_parens_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            ComplexFraction.from_string("1/2+1/4i")
+
+    def test_from_string_empty_string_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            ComplexFraction.from_string("")
+
+
+class TestComplexFractionStr(unittest.TestCase):
+
+    def test_str_positive_imag(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        self.assertEqual(str(c), "(1/2)+(1/4)i")
+
+    def test_str_negative_imag(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(-1, 4))
+        self.assertEqual(str(c), "(1/2)-(1/4)i")
+
+    def test_str_zero_real(self):
+        c = ComplexFraction(Fraction(0, 1), Fraction(1, 3))
+        self.assertEqual(str(c), "(0/1)+(1/3)i")
+
+    def test_str_roundtrip_positive(self):
+        c = ComplexFraction(Fraction(3, 4), Fraction(1, 2))
+        c2 = ComplexFraction.from_string(str(c))
+        self.assertEqual(c2.real.numerator, 3)
+        self.assertEqual(c2.real.denominator, 4)
+        self.assertEqual(c2.imag.numerator, 1)
+        self.assertEqual(c2.imag.denominator, 2)
+
+    def test_str_roundtrip_negative_imag(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(-3, 4))
+        c2 = ComplexFraction.from_string(str(c))
+        self.assertEqual(c2.imag.numerator, -3)
+        self.assertEqual(c2.imag.denominator, 4)
+
+
+class TestComplexFractionReduce(unittest.TestCase):
+
+    def test_reduce_reduces_real(self):
+        c = ComplexFraction(Fraction(2, 4), Fraction(1, 2))
+        c.reduce()
+        self.assertEqual(c.real.numerator, 1)
+        self.assertEqual(c.real.denominator, 2)
+
+    def test_reduce_reduces_imag(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(6, 9))
+        c.reduce()
+        self.assertEqual(c.imag.numerator, 2)
+        self.assertEqual(c.imag.denominator, 3)
+
+    def test_reduce_already_reduced_stays_same(self):
+        c = ComplexFraction(Fraction(1, 3), Fraction(2, 5))
+        c.reduce()
+        self.assertEqual(c.real.numerator, 1)
+        self.assertEqual(c.real.denominator, 3)
+        self.assertEqual(c.imag.numerator, 2)
+        self.assertEqual(c.imag.denominator, 5)
+
+
+class TestComplexFractionAddition(unittest.TestCase):
+
+    def test_add_two_complex_fractions(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        c2 = ComplexFraction(Fraction(1, 4), Fraction(1, 4))
+        result = c1 + c2
+        self.assertEqual(str(result.real), "3/4")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_add_returns_complex_fraction(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 2))
+        c2 = ComplexFraction(Fraction(1, 2), Fraction(1, 2))
+        self.assertIsInstance(c1 + c2, ComplexFraction)
+
+    def test_add_with_zero_complex(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        c2 = ComplexFraction(Fraction(0, 1), Fraction(0, 1))
+        result = c1 + c2
+        self.assertEqual(str(result.real), "1/2")
+        self.assertEqual(str(result.imag), "1/4")
+
+    def test_add_complex_and_int(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        result = c + 1
+        self.assertEqual(str(result.real), "3/2")
+        self.assertEqual(str(result.imag), "1/4")
+
+    def test_add_complex_and_fraction(self):
+        c = ComplexFraction(Fraction(1, 4), Fraction(1, 4))
+        result = c + Fraction(1, 4)
+        self.assertEqual(str(result.real), "1/2")
+        self.assertEqual(str(result.imag), "1/4")
+
+    def test_radd_int_plus_complex(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        result = 1 + c
+        self.assertEqual(str(result.real), "3/2")
+
+    def test_add_negative_imaginary_parts(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(-1, 4))
+        c2 = ComplexFraction(Fraction(1, 4), Fraction(-1, 4))
+        result = c1 + c2
+        self.assertEqual(str(result.imag), "-1/2")
+
+    def test_add_gives_zero_imag(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        c2 = ComplexFraction(Fraction(1, 4), Fraction(-1, 4))
+        result = c1 + c2
+        self.assertEqual(str(result.imag), "0/1")
+
+
+class TestComplexFractionSubtraction(unittest.TestCase):
+
+    def test_sub_two_complex_fractions(self):
+        c1 = ComplexFraction(Fraction(3, 4), Fraction(1, 2))
+        c2 = ComplexFraction(Fraction(1, 4), Fraction(1, 4))
+        result = c1 - c2
+        self.assertEqual(str(result.real), "1/2")
+        self.assertEqual(str(result.imag), "1/4")
+
+    def test_sub_returns_complex_fraction(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 2))
+        c2 = ComplexFraction(Fraction(1, 4), Fraction(1, 4))
+        self.assertIsInstance(c1 - c2, ComplexFraction)
+
+    def test_sub_gives_zero_real(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        c2 = ComplexFraction(Fraction(1, 2), Fraction(0, 1))
+        result = c1 - c2
+        self.assertEqual(str(result.real), "0/1")
+
+    def test_sub_complex_and_int(self):
+        c = ComplexFraction(Fraction(3, 2), Fraction(1, 4))
+        result = c - 1
+        self.assertEqual(str(result.real), "1/2")
+        self.assertEqual(str(result.imag), "1/4")
+
+    def test_sub_complex_and_fraction(self):
+        c = ComplexFraction(Fraction(3, 4), Fraction(1, 4))
+        result = c - Fraction(1, 4)
+        self.assertEqual(str(result.real), "1/2")
+
+    def test_rsub_int_minus_complex(self):
+        c = ComplexFraction(Fraction(1, 4), Fraction(1, 4))
+        result = 1 - c
+        self.assertEqual(str(result.real), "3/4")
+
+    def test_rsub_negates_imag(self):
+        c = ComplexFraction(Fraction(1, 4), Fraction(1, 4))
+        result = 1 - c
+        self.assertEqual(str(result.imag), "-1/4")
+
+    def test_sub_same_gives_zero(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        c2 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        result = c1 - c2
+        self.assertEqual(str(result.real), "0/1")
+        self.assertEqual(str(result.imag), "0/1")
+
+
+class TestComplexFractionMultiplication(unittest.TestCase):
+
+    def test_mul_two_complex_fractions(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 3))
+        c2 = ComplexFraction(Fraction(2, 1), Fraction(3, 1))
+        result = c1 * c2
+        self.assertEqual(str(result.real), "0/1")
+        self.assertEqual(str(result.imag), "13/6")
+
+    def test_mul_returns_complex_fraction(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        c2 = ComplexFraction(Fraction(2, 1), Fraction(1, 1))
+        self.assertIsInstance(c1 * c2, ComplexFraction)
+
+    def test_mul_by_one_plus_zero_i(self):
+        c1 = ComplexFraction(Fraction(3, 4), Fraction(1, 2))
+        c2 = ComplexFraction(Fraction(1, 1), Fraction(0, 1))
+        result = c1 * c2
+        self.assertEqual(str(result.real), "3/4")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_mul_complex_and_int(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        result = c * 2
+        self.assertEqual(str(result.real), "1/1")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_mul_complex_and_fraction(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        result = c * Fraction(2, 1)
+        self.assertEqual(str(result.real), "1/1")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_rmul_int_times_complex(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        result = 2 * c
+        self.assertEqual(str(result.real), "1/1")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_mul_by_zero_gives_zero(self):
+        c = ComplexFraction(Fraction(3, 4), Fraction(1, 2))
+        result = c * 0
+        self.assertEqual(str(result.real), "0/1")
+        self.assertEqual(str(result.imag), "0/1")
+
+    def test_mul_i_squared_gives_minus_one(self):
+        c1 = ComplexFraction(Fraction(0, 1), Fraction(1, 1))
+        c2 = ComplexFraction(Fraction(0, 1), Fraction(1, 1))
+        result = c1 * c2
+        self.assertEqual(str(result.real), "-1/1")
+        self.assertEqual(str(result.imag), "0/1")
+
+
+class TestComplexFractionDivision(unittest.TestCase):
+
+    def test_div_two_complex_fractions(self):
+        c1 = ComplexFraction(Fraction(1, 1), Fraction(2, 1))
+        c2 = ComplexFraction(Fraction(1, 1), Fraction(1, 1))
+        result = c1 / c2
+        self.assertEqual(str(result.real), "3/2")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_div_returns_complex_fraction(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        c2 = ComplexFraction(Fraction(1, 1), Fraction(0, 1))
+        self.assertIsInstance(c1 / c2, ComplexFraction)
+
+    def test_div_by_one_plus_zero_i_gives_same(self):
+        c1 = ComplexFraction(Fraction(3, 4), Fraction(1, 2))
+        c2 = ComplexFraction(Fraction(1, 1), Fraction(0, 1))
+        result = c1 / c2
+        self.assertEqual(str(result.real), "3/4")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_div_complex_by_int(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        result = c / 2
+        self.assertEqual(str(result.real), "1/4")
+        self.assertEqual(str(result.imag), "1/8")
+
+    def test_div_complex_by_fraction(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        result = c / Fraction(1, 2)
+        self.assertEqual(str(result.real), "1/1")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_rtruediv_int_by_complex(self):
+        c = ComplexFraction(Fraction(1, 1), Fraction(0, 1))
+        result = 1 / c
+        self.assertEqual(str(result.real), "1/1")
+
+    def test_rtruediv_negates_imag(self):
+        c = ComplexFraction(Fraction(0, 1), Fraction(1, 1))
+        result = 1 / c
+        self.assertEqual(str(result.real), "0/1")
+        self.assertEqual(str(result.imag), "-1/1")
+
+    def test_div_by_zero_raises(self):
+        c1 = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        c2 = ComplexFraction(Fraction(0, 1), Fraction(0, 1))
+        with self.assertRaises((ValueError, ZeroDivisionError)):
+            _ = c1 / c2
+
+
+class TestMathExpression(unittest.TestCase):
+
+    def test_math_expression_cannot_be_instantiated(self):
+        with self.assertRaises(TypeError):
+            MathExpression()
+
+    def test_fraction_is_math_expression(self):
+        f = Fraction(1, 2)
+        self.assertIsInstance(f, MathExpression)
+
+    def test_complex_fraction_is_math_expression(self):
+        c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
+        self.assertIsInstance(c, MathExpression)
+
+    def test_fraction_subclasses_math_expression(self):
+        self.assertTrue(issubclass(Fraction, MathExpression))
+
+    def test_complex_fraction_subclasses_math_expression(self):
+        self.assertTrue(issubclass(ComplexFraction, MathExpression))
+
+
+class TestEmptyHistoryError(unittest.TestCase):
+
+    def test_empty_history_error_is_exception(self):
+        self.assertTrue(issubclass(EmptyHistoryError, Exception))
+
+    def test_empty_history_error_can_be_raised(self):
+        with self.assertRaises(EmptyHistoryError):
+            raise EmptyHistoryError
+
+    def test_empty_history_error_can_be_raised_with_message(self):
+        with self.assertRaises(EmptyHistoryError):
+            raise EmptyHistoryError("ala ma kota")
+
+    def test_empty_history_error_caught_as_exception(self):
+        caught = False
+        try:
+            raise EmptyHistoryError("ala")
+        except Exception:
+            caught = True
+        self.assertTrue(caught)
+
+    def test_empty_history_error_not_caught_as_value_error(self):
+        with self.assertRaises(EmptyHistoryError):
+            try:
+                raise EmptyHistoryError("ala")
+            except ValueError:
+                pass
+
+
+class TestCalculatorWithComplexFractions(unittest.TestCase):
+
+    def test_evaluate_complex_addition(self):
+        k = Calculator()
+        result = k.evaluate("(1/2)+(1/4)i + (1/4)+(1/4)i")
+        self.assertEqual(str(result.real), "3/4")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_evaluate_complex_subtraction(self):
+        k = Calculator()
+        result = k.evaluate("(3/4)+(1/2)i - (1/4)+(1/4)i")
+        self.assertEqual(str(result.real), "1/2")
+        self.assertEqual(str(result.imag), "1/4")
+
+    def test_evaluate_complex_multiplication(self):
+        k = Calculator()
+        result = k.evaluate("(0/1)+(1/1)i * (0/1)+(1/1)i")
+        self.assertEqual(str(result.real), "-1/1")
+
+    def test_evaluate_complex_division(self):
+        k = Calculator()
+        result = k.evaluate("(1/1)+(2/1)i : (1/1)+(1/1)i")
+        self.assertEqual(str(result.real), "3/2")
+        self.assertEqual(str(result.imag), "1/2")
+
+    def test_evaluate_complex_result_is_complex_fraction(self):
+        k = Calculator()
+        result = k.evaluate("(1/2)+(1/4)i + (1/4)+(1/4)i")
+        self.assertIsInstance(result, ComplexFraction)
+
+    def test_history_stores_complex_fraction(self):
+        k = Calculator()
+        result = k.evaluate("(1/2)+(1/4)i + (1/4)+(1/4)i")
+        k.add_to_history(result)
+        self.assertIsInstance(k.history[0], ComplexFraction)
+
+    def test_parse_operand_with_i_returns_complex_fraction(self):
+        k = Calculator()
+        result = k._parse_operand("(1/2)+(1/4)i")
+        self.assertIsInstance(result, ComplexFraction)
+
+    def test_parse_operand_without_i_returns_fraction(self):
+        k = Calculator()
+        result = k._parse_operand("1/2")
+        self.assertIsInstance(result, Fraction)
 
 
 if __name__ == "__main__":
