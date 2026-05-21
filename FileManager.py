@@ -6,7 +6,7 @@ class FileManager:
     def load_from_file(calc, filename):
         try:
             with open(filename, "r") as f:
-                for line in f:
+                for line_num, line in enumerate(f, 1):
                     clean_line = line.strip()
                     if not clean_line:
                         continue
@@ -15,7 +15,8 @@ class FileManager:
                         fraction = calc.evaluate(clean_line)
                         calc.add_to_history(fraction)
                     except (ValueError, ZeroDivisionError, IndexError, TypeError) as e:
-                        calc.add_to_err_history(f'BŁĄD: {e}')
+                        calc.add_to_err_history(f'BŁĄD w linii {line_num}: {e}')
+                        print(f'BŁĄD w linii {line_num}: {e}')
 
         except (FileNotFoundError, PermissionError) as e:
             print(f"Problem z dostępem do pliku '{filename}' (Brak pliku lub uprawnień): {e}")
