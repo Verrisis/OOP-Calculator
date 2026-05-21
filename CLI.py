@@ -22,9 +22,20 @@ class ConsoleUI:
         return False
 
     def print_history(self):
-        print("\nHistoria operacji:")
-        for i, wynik in enumerate(self.calc.history, 1):
-            print(f"{i}. {wynik}")
+        print("\n--- Historia operacji ---")
+        if self.calc.history:
+            for i, wynik in enumerate(self.calc.history, 1):
+                print(f"{i}. {wynik}")
+        else:
+            print(" Brak udanych operacji.")
+
+        print("\n--- Historia błędów ---")
+        if self.calc.err_history:
+            for i, blad in enumerate(self.calc.err_history, 1):
+                print(f"{i}. {blad}")
+        else:
+            print(" Brak błędów2.")
+        print("-" * 25 + "\n")
 
     def run(self):
         print(
@@ -34,7 +45,10 @@ class ConsoleUI:
                 linia = input("> ").strip()
                 if linia.lower().startswith("pomoc"):
                     print(
-                        f"Dostępne komendy:\n1) zapisz <plik>  - Zapisuje historię i błędy do pliku\n2) wczytaj <plik> - Wczytuje i przelicza historię z pliku\n3) szereg <n>     - Liczy n-ty element szeregu harmonicznego\n4) debug          - Pokazuje info o ostatnim wyniku\n5) exit / quit    - Wyjście z programu")
+                        f"Dostępne komendy:\n1) zapisz <plik>  - Zapisuje historię i błędy do pliku\n2) wczytaj <plik> - Wczytuje i przelicza historię z pliku\n3) szereg <n>     - Liczy n-ty element szeregu harmonicznego\n4) historia       - Pokazuje operacje oraz błędy\n5) debug          - Pokazuje info o ostatnim wyniku\n5) exit / quit    - Wyjście z programu")
+                    continue
+                if linia.lower() == "historia":
+                    self.print_history()
                     continue
                 if linia.lower().startswith("zapisz"):
                     parts = linia.split()
@@ -55,7 +69,7 @@ class ConsoleUI:
                         FileManager.load_from_file(self.calc, parts[1])
                         print(f"Wczytano operacje z pliku {parts[1]}")
                     else:
-                        print("Błąd: Podaj nazwę pliku, np. 'wczytaj wejscie.txt'")
+                        print("Użycie: wczytaj <wejscie.txt>")
                     continue
                 if linia.lower().startswith("debug"):
                     if self.calc.history:
