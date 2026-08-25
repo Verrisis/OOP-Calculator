@@ -1,7 +1,5 @@
 import math
-
 from multipledispatch import dispatch
-
 from MathExpression import MathExpression
 
 

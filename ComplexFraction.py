@@ -1,7 +1,5 @@
 import re
-from enum import Enum
 from multipledispatch import dispatch
-
 from Fraction import Fraction
 from MathExpression import MathExpression
 
