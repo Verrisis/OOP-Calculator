@@ -23,15 +23,15 @@ class TestAPI(unittest.TestCase):
         if response.status_code == 404:
             assert "Historia operacji jest pusta" in response.json()["detail"]
 
-    def test_calculate_invalid_format_returns_400(self):
-        response = self.client.post("/calculate", json={"expression": "ala ma kota"})
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("Niepoprawny format", response.json()["detail"])
-
     def test_calculate_not_implemented_operator_returns_error(self):
         response = self.client.post("/calculate", json={"expression": "1/2 ^ 1/4"})
         self.assertIn(response.status_code, [400, 501])
         self.assertIn("Obecnie obsługujemy tylko operatory", response.json()["detail"])
+
+    def test_calculate_text_garbage_returns_custom_error(self):
+        response = self.client.post("/calculate", json={"expression": "ala ma kota"})
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Nie można przekonwertować", response.json()["detail"])
 
 
 if __name__ == "__main__":
