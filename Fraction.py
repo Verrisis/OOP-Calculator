@@ -125,13 +125,16 @@ class Fraction(MathExpression):
 
     @classmethod
     def from_string(cls, text):
-        if "/" in text:
-            num, den = map(int, text.split("/"))
-            return cls(num, den)
-        cleaned = text.replace(",", ".")
-        if "." in cleaned:
-            return cls(float(cleaned))
-        return cls(int(cleaned), 1)
+        try:
+            if "/" in text:
+                num, den = map(int, text.split("/"))
+                return cls(num, den)
+            cleaned = text.replace(",", ".")
+            if "." in cleaned:
+                return cls(float(cleaned))
+            return cls(int(cleaned), 1)
+        except (ValueError, TypeError):
+            raise ValueError(f"Nie można przekonwertować '{text}' na ułamek lub liczbę.")
 
     @staticmethod
     def harmonic_series(n):
