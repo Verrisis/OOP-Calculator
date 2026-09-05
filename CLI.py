@@ -24,8 +24,8 @@ class ConsoleUI:
     def print_history(self):
         print("\n--- Historia operacji ---")
         if self.calc.history:
-            for i, wynik in enumerate(self.calc.history, 1):
-                print(f"{i}. {wynik}")
+            for i, results in enumerate(self.calc.history, 1):
+                print(f"{i}. {results}")
         else:
             print(" Brak udanych operacji.")
 
@@ -89,9 +89,9 @@ class ConsoleUI:
                 if not linia:
                     continue
 
-                wynik = self.calc.evaluate(linia)
-                self.calc.add_to_history(wynik)
-                print(f"Wynik: {wynik}")
+                result = self.calc.evaluate(linia)
+                self.calc.add_to_history(result)
+                print(f"Wynik: {result}")
 
             except EOFError:
                 break

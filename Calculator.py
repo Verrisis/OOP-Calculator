@@ -25,10 +25,10 @@ class Calculator:
         parts = expression_line.split()
 
         if len(parts) == 3:
-            u1 = self._parse_operand(parts[0])
+            f1 = self._parse_operand(parts[0])
             operator = parts[1]
-            u2 = self._parse_operand(parts[2])
-            return "math", u1, operator, u2
+            f2 = self._parse_operand(parts[2])
+            return "math", f1, operator, f2
 
         elif len(parts) == 2 and parts[0] == "szereg":
             element = int(parts[1])
