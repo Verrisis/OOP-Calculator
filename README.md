@@ -9,15 +9,25 @@ A command-line based calculator built in Python. Originally an Object-Oriented P
 *   **Fault-Tolerant File I/O:** Can read and calculate equations from text files. If a line is corrupted (e.g., division by zero or bad formatting), the app isolates the error, reports the exact line to the user, and keeps processing the rest of the file.
 *   **Encapsulated State:** Operation history and error logs are kept strictly private and returned as immutable tuples to prevent accidental state modification.
 *   **Clean Architecture:** The CLI (`ConsoleUI` acting as a Context Manager) is completely decoupled from the math engine (`Calculator`).
+*   **REST API Integration:** Expanded the core CLI calculator into a backend microservice using **FastAPI**. It processes JSON payloads, performs calculations via the OOP engine, and returns structured JSON responses with robust HTTP status code handling (400, 404, 501).
 
 ## Tech Stack
 *   **Language:** Python 3
 *   **Architecture:** OOP, Command Pattern (lite), Context Managers
-*   **Libraries:** `multipledispatch`, `re` (Regex)
+*   **Libraries:** `FastAPI`, `uvicorn`, `multipledispatch`, `re` (Regex), `pytest`
 
 ## How to use
 
-Run the script from your terminal:
+**Run the REST API Server:**
+
+```bash
+uvicorn api:app --reload​
+```
+
+_Once running, navigate to `http://localhost:8000/docs` in your browser to interact with the API via the auto-generated Swagger UI._
+
+**Run the CLI interface:**
+
 ```bash
 python CLI.py
 ```
