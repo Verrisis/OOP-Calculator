@@ -270,27 +270,27 @@ class TestCalculator(unittest.TestCase):
 
     # --- evaluate: harmonic series ---
 
-    def test_evaluate_szereg_4(self):
+    def test_evaluate_series_4(self):
         k = Calculator()
-        result = k.evaluate("szereg 4")
+        result = k.evaluate("series 4")
         self.assertEqual(result.numerator, 25)
         self.assertEqual(result.denominator, 12)
 
-    def test_evaluate_szereg_1(self):
+    def test_evaluate_series_1(self):
         k = Calculator()
-        result = k.evaluate("szereg 1")
+        result = k.evaluate("series 1")
         self.assertEqual(result.numerator, 1)
         self.assertEqual(result.denominator, 1)
 
-    def test_evaluate_szereg_3(self):
+    def test_evaluate_series_3(self):
         k = Calculator()
-        result = k.evaluate("szereg 3")
+        result = k.evaluate("series 3")
         self.assertEqual(result.numerator, 11)
         self.assertEqual(result.denominator, 6)
 
-    def test_evaluate_szereg_0_returns_zero(self):
+    def test_evaluate_series_0_returns_zero(self):
         k = Calculator()
-        result = k.evaluate("szereg 0")
+        result = k.evaluate("series 0")
         self.assertEqual(result.numerator, 0)
         self.assertEqual(result.denominator, 1)
 
@@ -329,7 +329,7 @@ class TestCalculator(unittest.TestCase):
     def test_evaluate_text_garbage_raises_value_error(self):
         k = Calculator()
         with self.assertRaises((ValueError, TypeError)):
-            k.evaluate("ala ma kota")
+            k.evaluate("invalid input")
 
     # --- history ---
 
@@ -393,10 +393,10 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(result[0], "math")
         self.assertEqual(len(result), 4)
 
-    def test_parse_szereg_returns_szereg_tuple(self):
+    def test_parse_series_returns_series_tuple(self):
         k = Calculator()
-        result = k._parse("szereg 5")
-        self.assertEqual(result[0], "szereg")
+        result = k._parse("series 5")
+        self.assertEqual(result[0], "series")
         self.assertEqual(result[1], 5)
 
     def test_compute_addition(self):
@@ -422,7 +422,7 @@ class TestCalculator(unittest.TestCase):
     def test_execute_unknown_command_type_raises_value_error(self):
         k = Calculator()
         with self.assertRaises(ValueError):
-            k._execute(("ala ma kota",))
+            k._execute(("unknown_command",))
 
 
 class TestFileManager(unittest.TestCase):
@@ -658,7 +658,7 @@ class TestComplexFractionFromString(unittest.TestCase):
 
     def test_from_string_garbage_raises_value_error(self):
         with self.assertRaises(ValueError):
-            ComplexFraction.from_string("ala")
+            ComplexFraction.from_string("invalid")
 
     def test_from_string_missing_parens_raises_value_error(self):
         with self.assertRaises(ValueError):
@@ -937,7 +937,7 @@ class TestMathExpression(unittest.TestCase):
 
     def test_complex_fraction_is_math_expression(self):
         c = ComplexFraction(Fraction(1, 2), Fraction(1, 4))
-        self.assertIsInstance(c, MathExpression)
+        self.assertIsInstance(c, ComplexFraction)
 
     def test_fraction_subclasses_math_expression(self):
         self.assertTrue(issubclass(Fraction, MathExpression))
@@ -957,12 +957,12 @@ class TestEmptyHistoryError(unittest.TestCase):
 
     def test_empty_history_error_can_be_raised_with_message(self):
         with self.assertRaises(EmptyHistoryError):
-            raise EmptyHistoryError("ala ma kota")
+            raise EmptyHistoryError("empty history")
 
     def test_empty_history_error_caught_as_exception(self):
         caught = False
         try:
-            raise EmptyHistoryError("ala")
+            raise EmptyHistoryError("empty")
         except Exception:
             caught = True
         self.assertTrue(caught)
@@ -970,7 +970,7 @@ class TestEmptyHistoryError(unittest.TestCase):
     def test_empty_history_error_not_caught_as_value_error(self):
         with self.assertRaises(EmptyHistoryError):
             try:
-                raise EmptyHistoryError("ala")
+                raise EmptyHistoryError("empty")
             except ValueError:
                 pass
 

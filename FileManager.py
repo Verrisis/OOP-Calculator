@@ -15,13 +15,13 @@ class FileManager:
                         fraction = calc.evaluate(clean_line)
                         calc.add_to_history(fraction)
                     except (ValueError, ZeroDivisionError, IndexError, TypeError) as e:
-                        calc.add_to_err_history(f'BŁĄD w linii {line_num}: {e}')
-                        print(f'BŁĄD w linii {line_num}: {e}')
+                        calc.add_to_err_history(f'ERROR at line {line_num}: {e}')
+                        print(f'ERROR at line {line_num}: {e}')
 
         except (FileNotFoundError, PermissionError) as e:
-            print(f"Problem z dostępem do pliku '{filename}' (Brak pliku lub uprawnień): {e}")
+            print(f"File access error for '{filename}' (File missing or permission denied): {e}")
         except Exception as e:
-            print(f"Nieznany błąd systemu plików podczas wczytywania: {e}")
+            print(f"Unknown file system error while loading: {e}")
 
     @staticmethod
     def save_to_file(calc, filename):

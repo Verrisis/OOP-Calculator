@@ -1,5 +1,5 @@
-from Fraction import Fraction
 from ComplexFraction import ComplexFraction
+from Fraction import Fraction
 
 
 class Calculator:
@@ -30,12 +30,12 @@ class Calculator:
             f2 = self._parse_operand(parts[2])
             return "math", f1, operator, f2
 
-        elif len(parts) == 2 and parts[0] == "szereg":
+        elif len(parts) == 2 and parts[0] == "series":
             element = int(parts[1])
-            return "szereg", element
+            return "series", element
 
         else:
-            raise ValueError("Niepoprawny format. Użyj: 'ułamek operator ułamek'")
+            raise ValueError("Invalid format. Use: 'fraction operator fraction'")
 
     def _compute(self, f1, operator, f2):
         if operator == "+":
@@ -47,21 +47,21 @@ class Calculator:
         elif operator == ":":
             return f1 / f2
         else:
-            raise NotImplementedError("Obecnie obsługujemy tylko operatory: +, -, *, :")
+            raise NotImplementedError("Currently supported operators are only: +, -, *, :")
 
     def _execute(self, command):
         command_type = command[0]
 
         if command_type == "math":
-            _, u1, operator, u2 = command
-            return self._compute(u1, operator, u2)
+            _, f1, operator, f2 = command
+            return self._compute(f1, operator, f2)
 
-        elif command_type == "szereg":
+        elif command_type == "series":
             element = command[1]
             return Fraction.sum_harmonic_series(element)
 
         else:
-            raise ValueError("Nieznany typ komendy!")
+            raise ValueError("Unknown command type!")
 
     def evaluate(self, expression_line):
         command = self._parse(expression_line)

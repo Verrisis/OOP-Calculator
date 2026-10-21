@@ -1,5 +1,7 @@
 import re
+
 from multipledispatch import dispatch
+
 from Fraction import Fraction
 from MathExpression import MathExpression
 
@@ -93,4 +95,4 @@ class ComplexFraction(MathExpression):
                 imag = imag * -1
             return cls(real, imag)
         else:
-            raise ValueError("Nieprawidłowy formaty liczby urojonej")
+            raise ValueError("Invalid complex number format")
