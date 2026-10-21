@@ -1,45 +1,52 @@
-# OOP Terminal Calculator (Fractions & Complex Numbers)
+# Fraction & Complex Fraction Calculator
 
-A command-line based calculator built in Python. Originally an Object-Oriented Programming university project, but expanded beyond the core requirements to include complex fraction handling, fault-tolerant file I/O, and strict separation of concerns.
+A calculator for rational and complex fractions written in Python. I built this as a university project to practice object-oriented programming (inheritance, abstract base classes, encapsulation, operator overloading, and multiple dispatch), file I/O, CLI design, basic REST API development with FastAPI, and unit testing.
 
-## Key Features
+## Features
 
-*   **Smart Polymorphism:** No messy `if/else` type-checking ladders. Uses `multipledispatch` to seamlessly calculate mixed expressions (e.g., adding an integer to a complex fraction).
-*   **Complex Fractions Support:** A custom `ComplexFraction` class handles equations with real and imaginary parts. It uses a custom RegEx pipeline to parse inputs like `(1/2)+(3/4)i` without heavy string iteration loops.
-*   **Fault-Tolerant File I/O:** Can read and calculate equations from text files. If a line is corrupted (e.g., division by zero or bad formatting), the app isolates the error, reports the exact line to the user, and keeps processing the rest of the file.
-*   **Encapsulated State:** Operation history and error logs are kept strictly private and returned as immutable tuples to prevent accidental state modification.
-*   **Clean Architecture:** The CLI (`ConsoleUI` acting as a Context Manager) is completely decoupled from the math engine (`Calculator`).
-*   **REST API Integration:** Expanded the core CLI calculator into a backend microservice using **FastAPI**. It processes JSON payloads, performs calculations via the OOP engine, and returns structured JSON responses with robust HTTP status code handling (400, 404, 501).
+- **Rational Fractions (`Fraction`):** Supports creation from integers, floats, strings (including `/` notation and `.` or `,` decimals), and copy construction. Automatically simplifies fractions using `math.gcd` and normalizes negative signs in the denominator.
+- **Complex Fractions (`ComplexFraction`):** Represents complex numbers where both the real and imaginary parts are instances of `Fraction` in the format `(a/b)+(c/d)i` or `(a/b)-(c/d)i`.
+- **Operator Overloading & Multiple Dispatch:** Implements `+`, `-`, `*`, and `/` (including reverse operations) between fractions, complex fractions, integers, and floats using `multipledispatch`.
+- **Harmonic Series:** Calculates the partial sum of the first $n$ terms of the harmonic series using a Python generator (`series <n>`).
+- **History & File Management:** Tracks successful calculations and errors separately in immutable tuples, with support for batch loading expressions from a text file and exporting results (`<filename>`) and errors (`err_<filename>`).
+- **Two Interfaces:** Includes an interactive console UI (`CLI.py`) implemented as a context manager and a REST API (`API.py`) built with FastAPI.
 
-## Tech Stack
-*   **Language:** Python 3
-*   **Architecture:** OOP, Command Pattern (lite), Context Managers
-*   **Libraries:** `FastAPI`, `uvicorn`, `multipledispatch`, `re` (Regex), `pytest`
+## Expression Format
 
-## How to use
+Expressions are space-separated strings in the format `operand1 operator operand2`:
 
-**Run the REST API Server:**
+- Supported operators: `+`, `-`, `*`, `:` (colon is used for division so `/` can be used inside fractions).
+- Rational fraction examples: `1/2 + 1/4`, `3/4 : 1/2`, `0.5 * 2`.
+- Complex fraction examples: `(1/2)+(1/4)i + (1/4)+(1/4)i`, `(1/1)+(2/1)i : (1/1)+(1/1)i`.
+- Harmonic series command: `series 4` (returns `25/12`).
 
+## Project Structure
+
+- `MathExpression.py` — abstract base class (`ABC`) defining the `reduce()` interface.
+- `Fraction.py` — rational fraction implementation, arithmetic operators, string parser, and harmonic series generator.
+- `ComplexFraction.py` — complex fraction implementation and regex-based string parser.
+- `Calculator.py` — core parser and evaluator managing operation and error histories.
+- `FileManager.py` — static helper methods for reading expressions from files and saving histories.
+- `EmptyHistoryError.py` — custom exception raised when attempting to export or fetch an empty history.
+- `CLI.py` — interactive command-line interface (`help`, `history`, `save <file>`, `load <file>`, `series <n>`, `debug`, `exit`).
+- `API.py` — FastAPI web server exposing `POST /calculate` and `GET /history` endpoints.
+- `TestCalculatorAndFraction.py` & `TestAPI.py` — `unittest` test suites covering core classes, edge cases, file operations, and HTTP endpoints.
+
+## Installation & Usage
+
+1. **Install dependencies:** The project uses `multipledispatch`, `fastapi`, `pydantic`, `uvicorn`, and `httpx` (for FastAPI `TestClient`).
 ```bash
-uvicorn api:app --reload​
+pip install multipledispatch fastapi pydantic uvicorn httpx
 ```
-
-_Once running, navigate to `http://localhost:8000/docs` in your browser to interact with the API via the auto-generated Swagger UI._
-
-**Run the CLI interface:**
-
+2. **Run the CLI:**
 ```bash
 python CLI.py
 ```
-
-**Supported CLI Commands:**
-
-*   `help` - Shows available commands and usage examples.
-*   `history` - Displays a cleanly formatted log of past calculations and caught exceptions.
-*   `load <filename>` - Evaluates a list of equations from a `.txt` file (e.g., `load equations.txt`).
-*   `clear` - Clears the terminal screen.
-*   `exit` (or `quit`) - Safely terminates the application and closes the I/O streams.
-
-## Design Philosophy
-
-The main goal of this project was to stick to SOLID principles. The Open-Closed Principle is maintained via multiple dispatch, and Single Responsibility is enforced by keeping UI logic away from the math pipeline.
+3. **Run the FastAPI server:**
+```bash
+uvicorn API:app --reload
+```
+4. **Run unit tests:**
+```bash
+python -m unittest TestCalculatorAndFraction.py TestAPI.py
+```
