@@ -1,5 +1,7 @@
 import math
+
 from multipledispatch import dispatch
+
 from MathExpression import MathExpression
 
 
@@ -31,7 +33,7 @@ class Fraction(MathExpression):
             self.numerator = other.numerator
             self.denominator = other.denominator
         else:
-            raise TypeError("Przekazany obiekt nie jest ułamkiem!")
+            raise TypeError("The provided object is not a fraction!")
 
     @property
     def numerator(self):
@@ -48,7 +50,7 @@ class Fraction(MathExpression):
     @denominator.setter
     def denominator(self, value):
         if value == 0:
-            raise ValueError("Mianownik nie może być zerem!")
+            raise ValueError("Denominator cannot be zero!")
         elif value > 0:
             self.__denominator = value
         else:
@@ -134,7 +136,7 @@ class Fraction(MathExpression):
                 return cls(float(cleaned))
             return cls(int(cleaned), 1)
         except (ValueError, TypeError):
-            raise ValueError(f"Nie można przekonwertować '{text}' na ułamek lub liczbę.")
+            raise ValueError(f"Cannot convert '{text}' to a fraction or number.")
 
     @staticmethod
     def harmonic_series(n):
@@ -143,7 +145,7 @@ class Fraction(MathExpression):
 
     @staticmethod
     def sum_harmonic_series(n):
-        suma = Fraction()
+        total = Fraction()
         for fraction in Fraction.harmonic_series(n):
-            suma += fraction
-        return suma
+            total += fraction
+        return total
